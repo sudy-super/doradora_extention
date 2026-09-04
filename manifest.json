@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "doradora_detector",
+  "version": "1.2.0",
+  "description": "放置すると中断されるポップアップと小テスト画面を検知してアラームを鳴らす",
+  "content_scripts": [
+    {
+      "matches": ["https://dondora.online/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
