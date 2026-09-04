@@ -91,3 +91,37 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyB') alarm(true);
   if (e.code === 'KeyN') alarm(false);
 }, { capture: true });
+
+//-----------------------------------------------------------------------------
+// 左上に「残り時間 / 全体の長さ」を表示する。
+// 動画は react-player 経由の <video> 要素なので currentTime / duration をそのまま読む。
+// フルスクリーン対象が document.documentElement なので position:fixed で重ねられる。
+// 操作を邪魔しないよう pointer-events は無効にしておく。
+
+const HUD_INTERVAL_MS = 500;
+
+const hud = document.createElement('div');
+hud.style.cssText = [
+  'position:fixed', 'top:8px', 'left:8px', 'z-index:2147483647',
+  'pointer-events:none', 'padding:4px 10px', 'border-radius:6px',
+  'background:rgba(0,0,0,0.6)', 'color:#fff',
+  'font:600 14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace',
+  'font-variant-numeric:tabular-nums', 'white-space:nowrap',
+].join(';');
+document.body.appendChild(hud);
+
+function mmss(sec) {
+  const s = Math.max(0, Math.round(sec));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+setInterval(() => {
+  const video = document.querySelector('video');
+  // 動画がない画面 (ログイン、学科一覧など)や長さ未取得のときは出さない
+  if (!video || !Number.isFinite(video.duration)) {
+    hud.hidden = true;
+    return;
+  }
+  hud.hidden = false;
+  hud.textContent = `${mmss(video.duration - video.currentTime)} / ${mmss(video.duration)}`;
+}, HUD_INTERVAL_MS);
